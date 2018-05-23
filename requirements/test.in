@@ -3,3 +3,6 @@
 
 pytest-cov                # pytest extension for code coverage statistics
 pytest-django             # pytest extension for better Django support
+mock                      # Mocks for tests
+ddt                       # Data-driven tests
+factory-boy==2.8.1        # Model factories for Django

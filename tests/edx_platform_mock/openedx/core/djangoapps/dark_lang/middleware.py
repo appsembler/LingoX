@@ -1,0 +1,2 @@
+class DarkLangMiddleware(object):
+    pass

@@ -1,0 +1,2 @@
+class LanguagePreferenceMiddleware(object):
+    pass

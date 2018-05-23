@@ -81,11 +81,16 @@ extract_translations: ## extract strings to be translated, outputting .mo files
 	cd lingox && ../manage.py makemessages -l en -v1 -d django
 	cd lingox && ../manage.py makemessages -l en -v1 -d djangojs
 
+	cd tests/edx_platform_mock && ../../manage.py makemessages -l en -v1 -d django
+	cd tests/edx_platform_mock && ../../manage.py makemessages -l en -v1 -d djangojs
+
 compile_translations: ## compile translation files, outputting .po files for each supported language
 	cd lingox && ../manage.py compilemessages
+	cd tests/edx_platform_mock && ../../manage.py compilemessages
 
 detect_changed_source_translations:
 	cd lingox && i18n_tool changed
+	cd tests/edx_platform_mock && i18n_tool changed
 
 pull_translations: ## pull translations from Transifex
 	tx pull -af --mode reviewed
@@ -95,6 +100,7 @@ push_translations: ## push source translation files (.po) from Transifex
 
 dummy_translations: ## generate dummy translation (.po) files
 	cd lingox && i18n_tool dummy
+	cd tests/edx_platform_mock && i18n_tool dummy
 
 build_dummy_translations: extract_translations dummy_translations compile_translations ## generate and compile dummy translation files
 
