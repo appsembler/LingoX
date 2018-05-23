@@ -1,0 +1,4 @@
+# Core requirements for using this application
+
+Django                    # Web application framework
+futures==3.1.1            # Pin to fix an issue with Python 3 virtual envs. For caniusepython3, isort.
