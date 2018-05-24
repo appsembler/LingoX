@@ -186,11 +186,31 @@ class APIRequestHelperTest(TestCase):
         {'path': '/dashboard', 'should_be_api': False},
         {'path': '/', 'should_be_api': False},
         {'path': '/user_api/', 'should_be_api': True},
-        {'path': '/notifier_api/', 'should_be_api': True}
+        {'path': '/notifier_api/', 'should_be_api': True},
+        {'path': '/reporting/api/', 'should_be_api': False},  # By default, LingoX don't know about reporting
     )
-    def test_is_api_request_helper(self, path, should_be_api):
+    def test_default_api_endpoints(self, path, should_be_api):
         """
-        Tests the `is_api_request` helper on different params.
+        Tests the `is_api_request` helper on the default configuration.
+        """
+        assert is_api_request(self.request_factory.get(path)) == should_be_api
+
+    @override_settings(ENV_TOKENS={
+        'LINGOX_API_URL_PREFIXES': [
+            '/api/',
+            '/reporting/api/',
+        ]
+    })
+    @ddt.unpack
+    @ddt.data(
+        {'path': '/', 'should_be_api': False},  # Still falsey
+        {'path': '/api/', 'should_be_api': True},  # Custom configuration should replicate the default
+        {'path': '/user_api/', 'should_be_api': False},  # Can be configured to ignore default's configurations.
+        {'path': '/reporting/api/', 'should_be_api': True},  # LingoX's now recognizes /reporting/api
+    )
+    def test_endpoints_from_configs(self, path, should_be_api):
+        """
+        Tests the `is_api_request` helper on the customized configuration.
         """
         assert is_api_request(self.request_factory.get(path)) == should_be_api
 

@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 import logging
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 LOGGER = logging.getLogger(__name__)
@@ -72,11 +73,16 @@ def is_api_request(request):
         request: A django request.
     Return: True if the request is an API request and False otherwise.
     """
-    if request.path.startswith('/api/'):
-        return True
-    elif request.path.startswith('/user_api/'):
-        return True
-    elif request.path.startswith('/notifier_api/'):
-        return True
+    default_api_prefixes = [
+        '/api/',
+        '/user_api/',
+        '/notifier_api/',
+    ]
+
+    api_prefixes = settings.ENV_TOKENS.get('LINGOX_API_URL_PREFIXES', default_api_prefixes)
+
+    for prefix in api_prefixes:
+        if request.path.startswith(prefix):
+            return True
 
     return False
