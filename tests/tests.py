@@ -7,6 +7,7 @@ from __future__ import absolute_import, unicode_literals
 import ddt
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
 from lingox.helpers import add_locale_middleware, is_api_request
@@ -17,11 +18,13 @@ from lingox.middleware import DefaultLocaleMiddleware
 
 
 LINGOX_MIDDLEWARE = 'lingox.middleware.DefaultLocaleMiddleware'
+SITE_MIDDLEWARE = 'django.contrib.sites.middleware.CurrentSiteMiddleware'
 
 UNMODIFIED_MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -112,26 +115,56 @@ class DefaultLocaleMiddlewareTest(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        {'settings_lang': 'en', 'req_lang': 'en', 'valid': 'Hello World', 'invalid': u'Saluton mondo!'},
-        {'settings_lang': 'en', 'req_lang': 'eo', 'valid': 'Hello World', 'invalid': u'Saluton mondo!'},
-        {'settings_lang': 'eo', 'req_lang': 'en', 'valid': u'Héllö Wörld!', 'invalid': 'Hello World'},
-        {'settings_lang': 'eo', 'req_lang': 'eo', 'valid': u'Héllö Wörld!', 'invalid': 'Hello World'},
+        {
+            # The site-wide language should be used instead of the request's.
+            'settings_lang': 'en',
+            'request_lang': 'eo',
+            'site_configs': {},
+            'expected': 'Hello World',
+        },
+        {
+            # The site-wide language should be used instead of the request's.
+            'settings_lang': 'eo',
+            'request_lang': 'en',
+            'site_configs': {},
+            'expected': u'Héllö Wörld',
+        },
+        {
+            # The "Microsite" language should be used instead.
+            'settings_lang': 'eo',
+            'request_lang': 'eo',
+            'site_configs': {
+                'LANGUAGE_CODE': 'en',
+            },
+            'expected': u'Hello World',
+        },
+        {
+            # The "Microsite" language should be used instead.
+            'settings_lang': 'en',
+            'request_lang': 'en',
+            'site_configs': {
+                'LANGUAGE_CODE': 'eo',
+            },
+            'expected': u'Héllö Wörld',
+        },
     )
     @override_settings(MIDDLEWARE_CLASSES=middleware_classes)
-    def test_enabled_middleware_in_request(self, settings_lang, req_lang, valid, invalid):
+    def test_enabled_middleware_in_request(self, settings_lang, request_lang, site_configs, expected):
         """
         Test different combinations of LANGUAGE_CODE and Accept-Language.
 
         The response language should always respect the `settings_lang` and ignore the `request_lang`.
+
+        If `openedx.core.djangoapps.site_configuration.helpers.get_value('LANGUAGE_CODE') is available`, that should
+        override the settings.LANGUAGE_CODE.
         """
-        with override_settings(LANGUAGE_CODE=settings_lang):
+        with override_settings(LANGUAGE_CODE=settings_lang, MOCK_SITE_CONFIGS=site_configs):
             headers = {
-                'Accept-Language': req_lang,
+                'Accept-Language': request_lang,
             }
 
             res = self.client.get('/', **headers)
-            self.assertContains(res, valid, msg_prefix='Incorrect language detected')
-            self.assertNotContains(res, invalid, msg_prefix='Incorrect language detected')
+            self.assertContains(res, expected, msg_prefix='Incorrect language detected')
 
 
 @ddt.ddt
@@ -174,8 +207,6 @@ class MiddlewareAdderHelperTest(TestCase):
         'django.middleware.locale.LocaleMiddleware',
     )
 
-    lingox_middleware = LINGOX_MIDDLEWARE
-
     @ddt.data(*edx_middlewares)
     def test_missing_middleware_on_update(self, middleware_to_remove):
         """
@@ -189,6 +220,41 @@ class MiddlewareAdderHelperTest(TestCase):
         with self.assertRaises(ValueError):
             add_locale_middleware(middleware_classes)
 
+    def test_missing_site_middleware(self):
+        """
+        The helper should require the CurrentSiteMiddleware to be available in the middleware classes list.
+        """
+        middleware_classes = tuple(
+            class_name for class_name in UNMODIFIED_MIDDLEWARE_CLASSES
+            if class_name != SITE_MIDDLEWARE
+        )
+
+        with self.assertRaises(ValueError):
+            add_locale_middleware(middleware_classes)
+
+    def test_incorrect_site_middleware_location(self):
+        """
+        Ensure the helper complains about bizarre middleware configs.
+
+        DefaultLocaleMiddleware can only work _after_ the CurrentSiteMiddleware
+        and _before_ every locale-aware middleware.
+        """
+        middleware_classes = [
+            'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+
+            'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
+
+            # After a locale-middleware, to confuse the helper
+            'django.contrib.sites.middleware.CurrentSiteMiddleware',
+
+            'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+        ]
+
+        with self.assertRaises(ImproperlyConfigured):
+            add_locale_middleware(middleware_classes)
+
     @ddt.data(*edx_middlewares)
     def test_middleware_order(self, other_middleware):
         """
@@ -196,7 +262,7 @@ class MiddlewareAdderHelperTest(TestCase):
         """
         updated_middlewares = add_locale_middleware(UNMODIFIED_MIDDLEWARE_CLASSES)
 
-        lingx_index = updated_middlewares.index(self.lingox_middleware)
+        lingx_index = updated_middlewares.index(LINGOX_MIDDLEWARE)
         other_index = updated_middlewares.index(other_middleware)
         assert lingx_index < other_index,  \
             'DefaultLocaleMiddleware should come before any other locale-related middleware'

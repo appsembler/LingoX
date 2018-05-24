@@ -5,6 +5,8 @@ from __future__ import absolute_import, unicode_literals
 
 import logging
 
+from django.core.exceptions import ImproperlyConfigured
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -18,6 +20,7 @@ def add_locale_middleware(middleware_classes):
         The new MIDDLEWARE_CLASSES with the lingox middleware.
     """
     lingox_middleware = 'lingox.middleware.DefaultLocaleMiddleware'
+    site_middleware = 'django.contrib.sites.middleware.CurrentSiteMiddleware'
 
     if lingox_middleware in middleware_classes:
         return middleware_classes
@@ -34,14 +37,31 @@ def add_locale_middleware(middleware_classes):
     ]
 
     # If this broke, then this module needs an update to sync with the edX Platform default middlewares.
-    indexes = [
+    locale_middleware_indexes = [
         middleware_classes.index(class_name) for class_name in other_locale_middlewares
     ]
 
-    first_index = min(indexes)
+    first_locale_middleware_index = min(locale_middleware_indexes)
 
-    # Insert the DefaultLocaleMiddleware before any other locale-related middleware in order for it to work
-    return middleware_classes[:first_index] + (lingox_middleware,) + middleware_classes[first_index:]
+    sites_middleware_index = middleware_classes.index(site_middleware)
+
+    if sites_middleware_index > first_locale_middleware_index:
+        raise ImproperlyConfigured(
+            # This exception indicates that this package either needs an update, or no longer compatible with the edX
+            # platform sites.
+            'Something is wrong with the MIDDLEWARE_CLASSES, the sites middleware was found after a locale-aware '
+            'middleware. The `DefaultLocaleMiddleware` cannot work in this case. MIDDLEWARE_CLASSES={classes}'.format(
+                classes=middleware_classes,
+            )
+        )
+
+    # Insert the DefaultLocaleMiddleware before any other locale-related
+    # middleware in order for it to work
+    return (
+        middleware_classes[:first_locale_middleware_index]
+        + (lingox_middleware,)
+        + middleware_classes[first_locale_middleware_index:]
+    )
 
 
 def is_api_request(request):
