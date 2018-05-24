@@ -54,6 +54,17 @@ Next, install LingoX and configure it:
 - Reload the server
 - Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
 
+Support Custom API Endpoints
+  To retain compatibility with the mobile applications, LingoX will avoid tampering the
+  ``Accept-Language`` header of any URL with the following prefixes:
+  - ``/api/``
+  - ``/user_api/``
+  - ``/notifier_api/``
+
+  However, different apps can introduce different API endpoints that are not covered, when needed LingoX can be
+  configured to filter different prefixes with the ``LINGOX_API_URL_PREFIXES`` setting in the ``lms.env.json``
+  (or ``EDXAPP_ENV_EXTRA.LINGOX_API_URL_PREFIXES`` in ``server-vars.yml``).
+
 Monkey Patching
 ---------------
 This module monkey-patches the edX platform the following way:

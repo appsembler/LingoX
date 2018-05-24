@@ -24,6 +24,8 @@ def root(*args):
 # Dummy value to emulate the Open edX site configuration helpers.
 MOCK_SITE_CONFIGS = {}
 
+# Dummy value to emulate the Open edX `ENV_TOKENS` in `aws.py`.
+ENV_TOKENS = {}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

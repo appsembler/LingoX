@@ -12,6 +12,8 @@ urlpatterns = [
     url(r'^user_api/$', views.api),
     url(r'^notifier_api/$', views.api),
 
+    url(r'^reporting/api/$', views.api),
+
     url(r'^dashboard/$', views.home),
     url(r'^$', views.home),
 ]
