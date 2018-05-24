@@ -1,49 +1,62 @@
-lingox
-=============================
+LingoX
+======
 
-|travis-badge| |codecov-badge| |license-badge|
-
-The ``README.rst`` file should start with a brief description of the repository,
-which sets it in the context of other repositories under the ``appsembler``
-organization. It should make clear where this fits in to the overall Appsembler
-codebase.
+|travis-badge| |codecov-badge|
 
 An app to enforce a default language for the edX Platform regardless of browser language.
 
-Overview (please modify)
-------------------------
+Overview
+--------
 
-The ``README.rst`` file should then provide an overview of the code in this
-repository, including the main components and useful entry points for starting
-to understand the code in more detail.
+The edX Platform and other Django-based is bundled by default with ``LocaleMiddleware``
+which aims to server localized pages to the users based on their browser language
+which is advertised with the ``Accept-Language`` header.
 
-Documentation
--------------
+For a huge number of users this is far from correct, since it's not uncommon for users to
+use an English browser interface yet expect your site to be Arabic. This is especially
+true for Arabic sites. Some sites are offered in a single, other than English, language only.
 
-The full documentation is at https://lingox.readthedocs.org.
+This package helps to enforce ``settings.LANGUAGE_CODE`` as the site's default language for
+the edX Platform, while still allowing learners to change the language. This package
+also maintains backward compatibility with API endpoints and pass the ``Accept-Language``
+header as-is.
+
+
+How to Install
+--------------
+
+- ``$ pip install -e git+git@github.com:appsembler/LingoX.git#egg=lingox``
+- Add ``lingox`` to the ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
+- Set ``LANGUAGE_CODE`` to ``ar``
+- Reload the server
+- Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
+
+
+Monkey Patching
+---------------
+This module monkey-patches the edX platform the following way:
+
+- Add the ``DefaultLocaleMiddleware`` to ``MIDDLEWARE_CLASSES`` before any *known* locale-aware middleware
+- The middleware overrides the ``Accept-Language`` header with ``settings.LANGUAGE_CODE``
+
 
 License
 -------
 
-The code in this repository is licensed under the MIT License unless otherwise noted.
+The code in this repository is licensed under the MIT License unless
+otherwise noted.
 
 Please see ``LICENSE.txt`` for details.
+
+The original code was developed at `Edraak <https://github.com/Edraak/edraak-platform/pull/38>`_ and used to be
+licensed with AGPL 3.0. This repo has been re-licensed to MIT after Edraak's permission.
 
 How To Contribute
 -----------------
 
-Contributions are very welcome.
-
-Please read `How To Contribute <https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst>`_ for details.
-
-Even though they were written with ``edx-platform`` in mind, the guidelines
-should be followed for Open edX code in general.
-
-PR description template should be automatically applied if you are sending PR from github interface; otherwise you
-can find it it at `PULL_REQUEST_TEMPLATE.md <https://github.com/appsembler/lingox/blob/master/.github/PULL_REQUEST_TEMPLATE.md>`_
-
-Issue report template should be automatically applied if you are sending it from github UI as well; otherwise you
-can find it at `ISSUE_TEMPLATE.md <https://github.com/appsembler/lingox/blob/master/.github/ISSUE_TEMPLATE.md>`_
+Contributions are very welcome. We're happy to accept pull requests.
+TravisCI will check your code for you, and we should have a reviewer
+in a couple of days.
 
 Reporting Security Issues
 -------------------------
