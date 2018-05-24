@@ -6,11 +6,14 @@ from __future__ import absolute_import, unicode_literals
 from django.conf import settings
 
 from lingox.helpers import is_api_request
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class DefaultLocaleMiddleware(object):
     """
     Change the language to `settings.LANGUAGE_CODE` for all non-API requests.
+
+    If there's a site_configuration `LANGUAGE_CODE`, that will be used instead.
 
     This will force the i18n machinery to always choose settings.LANGUAGE_CODE
     as the default initial language, unless another one is set via sessions or cookies.
@@ -32,4 +35,5 @@ class DefaultLocaleMiddleware(object):
 
             # Enforce LANGUAGE_CODE regardless of the browser provided language
             # Django will use this value in the LocaleMiddleware to display the desired language
-            request.META['HTTP_ACCEPT_LANGUAGE'] = settings.LANGUAGE_CODE
+            language_code = configuration_helpers.get_value('LANGUAGE_CODE', settings.LANGUAGE_CODE)
+            request.META['HTTP_ACCEPT_LANGUAGE'] = language_code

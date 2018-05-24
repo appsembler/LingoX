@@ -21,10 +21,15 @@ def root(*args):
     return join(abspath(dirname(__file__)), *args)
 
 
+# Dummy value to emulate the Open edX site configuration helpers.
+MOCK_SITE_CONFIGS = {}
+
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
