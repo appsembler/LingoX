@@ -47,7 +47,7 @@ feature. But mostly it's a configuration model in the admin panel available unde
 
 Next, install LingoX and configure it:
 
-- ``$ pip install -e git+git@github.com:appsembler/LingoX.git#egg=lingox``
+- ``$ pip install -e git+https://github.com/appsembler/LingoX.git#egg=lingox``
 - Add ``lingox`` to the ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
 - Set ``LANGUAGE_CODE`` to ``ar``
 - To configure a different language for a specific site go to:
