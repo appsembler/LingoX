@@ -51,7 +51,7 @@ def add_locale_middleware(middleware_classes):
             # This exception indicates that this package either needs an update, or no longer compatible with the edX
             # platform sites.
             'Something is wrong with the MIDDLEWARE_CLASSES, the sites middleware was found after a locale-aware '
-            'middleware. The `DefaultLocaleMiddleware` cannot work in this case. MIDDLEWARE_CLASSES={classes}'.format(
+            'middleware. The `DefaultLocaleMiddleware` cannot work in this case. original={classes}'.format(
                 classes=middleware_classes,
             )
         )

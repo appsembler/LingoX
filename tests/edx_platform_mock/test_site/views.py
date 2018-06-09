@@ -9,5 +9,4 @@ def api(request):
 
 
 def home(request):
-    body = '<h1>{text}</h1>'.format(text=_('Hello World!'))
-    return HttpResponse(body, content_type='text/html')
+    return HttpResponse(_('Hello World!'))

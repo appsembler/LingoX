@@ -25,8 +25,7 @@ class DefaultLocaleMiddleware(object):
         """
         Change the request's `HTTP_ACCEPT_LANGUAGE` to `settings.LANGUAGE_CODE`.
         """
-        # This middleware is only needed for regular browser pages, it's effect is breaking the behaviour on the
-        # mobile apps.
+        # This middleware is only needed for regular browser pages. It is incompatible with the mobile apps.
         if not is_api_request(request):
             if 'HTTP_ACCEPT_LANGUAGE' in request.META:
                 # Preserve the browser provided language just in case,

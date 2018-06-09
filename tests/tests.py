@@ -187,6 +187,7 @@ class APIRequestHelperTest(TestCase):
         {'path': '/', 'should_be_api': False},
         {'path': '/user_api/', 'should_be_api': True},
         {'path': '/notifier_api/', 'should_be_api': True},
+        {'path': '/api/discussion/', 'should_be_api': True},
         {'path': '/reporting/api/', 'should_be_api': False},  # By default, LingoX don't know about reporting
     )
     def test_default_api_endpoints(self, path, should_be_api):

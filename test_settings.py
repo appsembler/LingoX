@@ -62,7 +62,7 @@ INSTALLED_APPS = (
     'test_site',
 )
 
-LANGUAGE_CODE = 'ar'
+LANGUAGE_CODE = 'eo'
 
 LOCALE_PATHS = [
     root('lingox', 'conf', 'locale'),

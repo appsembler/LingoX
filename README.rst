@@ -9,9 +9,9 @@ while still allowing individual learners to change their language preference.
 Overview
 --------
 
-The edX Platform and other Django-based is bundled by default with ``LocaleMiddleware``
-which aims to server localized pages to the users based on their browser language
-which is advertised with the ``Accept-Language`` header.
+By default Django sites including the edX Platform use ``LocaleMiddleware``
+to serve localized pages to the users based on their browser language.
+The browser language is advertised using the ``Accept-Language`` HTTP header.
 
 For a huge number of users this is far from correct, since it's not uncommon for users to
 use an English browser interface yet expect your site to be Arabic. This is especially
@@ -19,8 +19,8 @@ true for Arabic sites. Some sites are offered in a single, other than English, l
 
 This package helps to enforce ``settings.LANGUAGE_CODE`` (or ``site_configuration`` provided
 value) as the site's default language for the edX Platform.
-This package do allow learners to change the language. This package
-also maintains backward compatibility with API endpoints and pass the ``Accept-Language``
+This package does allow learners to change the language. This package
+also maintains backward compatibility with API endpoints and passes the ``Accept-Language``
 header as-is.
 
 
@@ -50,8 +50,10 @@ Next, install LingoX and configure it:
 - ``$ pip install -e git+https://github.com/appsembler/LingoX.git#egg=lingox``
 - Add ``lingox`` to the ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
 - Set ``LANGUAGE_CODE`` to ``ar``
-- To configure a different language for a specific site go to:
 - Reload the server
+- **Optional:** To configure a different language for a specific site go to Sites
+  Configuration `/admin/site_configuration/siteconfiguration/`, add a ``LANGUAGE_CODE`` key with the desired
+  site-specific value to the site's configuration JSON
 - Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
 
 Support Custom API Endpoints
@@ -69,10 +71,31 @@ Monkey Patching
 ---------------
 This module monkey-patches the edX platform the following way:
 
-- Add the ``DefaultLocaleMiddleware`` to ``MIDDLEWARE_CLASSES`` before any *known* locale-aware middleware
+- Add the ``DefaultLocaleMiddleware`` to ``MIDDLEWARE_CLASSES`` before any *known* locale-aware middleware.
 - The middleware overrides the ``Accept-Language`` header with
   ``site_configuration.helpers.get_value('LANGUAGE_CODE')`` or ``settings.LANGUAGE_CODE`` when the former is not
   available.
+
+How to Develop
+--------------
+This is mostly a standard `Open edX django cookie cutter app <https://github.com/edx/cookiecutter-django-app>`_.
+To start development or run the tests locally, first the environment must be prepared:
+
+.. code-block:: bash
+
+   $ mkvirtualenv lingox
+   $ make requirements
+   $ make quality
+   $ make test
+
+To run the local development server:
+
+.. code-block:: bash
+
+   $ python manage.py migrate
+   $ python manage.py runserver
+
+
 
 License
 -------
