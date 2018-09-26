@@ -53,8 +53,8 @@ Next, install LingoX and configure it:
 - Reload the server
 - Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
 
-- **Optional:** Few deployments uses the Django Sites framework (aka Microsites). 
-  If your deployment uses this framework you can still configure a different 
+- **Optional:** Few deployments uses the Django Sites framework (aka Microsites).
+  If your deployment uses this framework you can still configure a different
   language for a specific site: go to Sites
   Configuration ``/admin/site_configuration/siteconfiguration/``, add a ``LANGUAGE_CODE`` key with the desired
   site-specific value to the site's configuration JSON.
