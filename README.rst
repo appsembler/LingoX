@@ -51,10 +51,13 @@ Next, install LingoX and configure it:
 - Add ``lingox`` to the ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
 - Set ``LANGUAGE_CODE`` to ``ar``
 - Reload the server
-- **Optional:** To configure a different language for a specific site go to Sites
-  Configuration `/admin/site_configuration/siteconfiguration/`, add a ``LANGUAGE_CODE`` key with the desired
-  site-specific value to the site's configuration JSON
 - Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
+
+- **Optional:** Few deployments uses the Django Sites framework (aka Microsites).
+  If your deployment uses this framework you can still configure a different
+  language for a specific site: go to Sites
+  Configuration ``/admin/site_configuration/siteconfiguration/``, add a ``LANGUAGE_CODE`` key with the desired
+  site-specific value to the site's configuration JSON.
 
 Support Custom API Endpoints
   To retain compatibility with the mobile applications, LingoX will avoid tampering the
