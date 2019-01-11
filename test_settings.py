@@ -27,6 +27,11 @@ MOCK_SITE_CONFIGS = {}
 # Dummy value to emulate the Open edX `ENV_TOKENS` in `aws.py`.
 ENV_TOKENS = {}
 
+# Dummy feature flags dictionary.
+FEATURES = {
+    'ENABLE_LINGOX': False,  # The feature is disabled by default.
+}
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

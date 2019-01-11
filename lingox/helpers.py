@@ -8,6 +8,8 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -86,3 +88,11 @@ def is_api_request(request):
             return True
 
     return False
+
+
+def is_feature_enabled():
+    """
+    Check if the feature is enabled for the Site or for the platform as a whole.
+    """
+    is_enabled_in_platform = settings.FEATURES.get('ENABLE_LINGOX', False)
+    return configuration_helpers.get_value('ENABLE_LINGOX', is_enabled_in_platform)
