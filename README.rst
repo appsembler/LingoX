@@ -124,8 +124,8 @@ Reporting Security Issues
 Please do not report security issues in public. Please email security@appsembler.org.
 
 
-.. |travis-badge| image:: https://travis-ci.org/appsembler/lingox.svg?branch=master
-    :target: https://travis-ci.org/appsembler/lingox
+.. |travis-badge| image:: https://travis-ci.org/appsembler/LingoX.svg?branch=master
+    :target: https://travis-ci.org/appsembler/LingoX
     :alt: Travis
 
 .. |codecov-badge| image:: http://codecov.io/github/appsembler/lingox/coverage.svg?branch=master
