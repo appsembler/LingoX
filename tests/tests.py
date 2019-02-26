@@ -5,12 +5,13 @@ Tests for LingoX.
 from __future__ import absolute_import, unicode_literals
 
 import ddt
+from mock import patch
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
-from lingox.helpers import add_locale_middleware, is_api_request
+from lingox.helpers import add_locale_middleware, is_api_request, is_feature_enabled
 from lingox.middleware import DefaultLocaleMiddleware
 
 # The disable below because pylint is not recognizing request.META.
@@ -47,7 +48,8 @@ class SettingsTest(TestCase):
         """
         Ensure that the app is enabled.
         """
-        assert 'lingox' in settings.INSTALLED_APPS, 'The app should be enabled by default in test.'
+        assert 'lingox' in settings.INSTALLED_APPS, 'The app should be installed by default in test.'
+        assert not settings.FEATURES['ENABLE_LINGOX'], 'The app should be disabled by default in test.'
 
     def test_middleware_should_exists(self):
         """
@@ -84,7 +86,7 @@ class DefaultLocaleMiddlewareTest(TestCase):
         self.middleware = DefaultLocaleMiddleware()
         self.request_factory = RequestFactory()
 
-    @override_settings(LANGUAGE_CODE='eo')
+    @override_settings(LANGUAGE_CODE='eo', FEATURES={'ENABLE_LINGOX': True})
     def test_non_api_views(self):
         """
         Test the middleware on non-API pages.
@@ -100,7 +102,7 @@ class DefaultLocaleMiddlewareTest(TestCase):
             'Should preserve the original language in another META variable.'
 
     @ddt.data('/api/', '/user_api/')
-    @override_settings(LANGUAGE_CODE='ar')
+    @override_settings(LANGUAGE_CODE='ar', FEATURES={'ENABLE_LINGOX': True})
     def test_api_views(self, api_url):
         """
         Ensure that the middleware doesn't change the non-API pages.
@@ -113,43 +115,45 @@ class DefaultLocaleMiddlewareTest(TestCase):
         assert req.META['HTTP_ACCEPT_LANGUAGE'] == client_language,  \
             'The middleware is being used but it should NOT change the language for API views.'
 
-    @ddt.unpack
     @ddt.data(
         {
-            # The site-wide language should be used instead of the request's.
             'settings_lang': 'en',
             'request_lang': 'eo',
             'site_configs': {},
             'expected': 'Hello World',
+            'unexpected': 'Héllö Wörld',
+            'message': 'The site-wide language should be used instead of the request\'s.',
         },
         {
-            # The site-wide language should be used instead of the request's.
             'settings_lang': 'eo',
             'request_lang': 'en',
             'site_configs': {},
-            'expected': u'Héllö Wörld',
+            'expected': 'Héllö Wörld',
+            'unexpected': 'Hello World',
+            'message': 'The site-wide language should be used instead of the request\'s.',
         },
         {
-            # The "Microsite" language should be used instead.
             'settings_lang': 'eo',
             'request_lang': 'eo',
             'site_configs': {
                 'LANGUAGE_CODE': 'en',
             },
-            'expected': u'Hello World',
+            'expected': 'Hello World',
+            'unexpected': 'Héllö Wörld',
+            'message': 'The "Microsite" language should be used instead.',
         },
         {
-            # The "Microsite" language should be used instead.
             'settings_lang': 'en',
             'request_lang': 'en',
             'site_configs': {
                 'LANGUAGE_CODE': 'eo',
             },
-            'expected': u'Héllö Wörld',
+            'expected': 'Héllö Wörld',
+            'unexpected': 'Hello World',
+            'message': 'The "Microsite" language should be used instead.',
         },
     )
-    @override_settings(MIDDLEWARE_CLASSES=middleware_classes)
-    def test_enabled_middleware_in_request(self, settings_lang, request_lang, site_configs, expected):
+    def test_enabled_middleware_in_request(self, data):
         """
         Test different combinations of LANGUAGE_CODE and Accept-Language.
 
@@ -158,13 +162,99 @@ class DefaultLocaleMiddlewareTest(TestCase):
         If `openedx.core.djangoapps.site_configuration.helpers.get_value('LANGUAGE_CODE') is available`, that should
         override the settings.LANGUAGE_CODE.
         """
-        with override_settings(LANGUAGE_CODE=settings_lang, MOCK_SITE_CONFIGS=site_configs):
-            headers = {
-                'Accept-Language': request_lang,
-            }
+        overrides = {
+            'LANGUAGE_CODE': data['settings_lang'],
+            'MOCK_SITE_CONFIGS': data['site_configs'],
+            'FEATURES': {
+                'ENABLE_LINGOX': True
+            },
+            'MIDDLEWARE_CLASSES': self.middleware_classes,
+        }
+        with override_settings(**overrides):
+            res = self.client.get('/', HTTP_ACCEPT_LANGUAGE=data['request_lang'])
 
-            res = self.client.get('/', **headers)
-            self.assertContains(res, expected, msg_prefix='Incorrect language detected')
+            msg_prefix = 'Incorrect language detected - {message}'.format(message=data['message'])
+            self.assertNotContains(res, data['unexpected'], msg_prefix=msg_prefix)
+            self.assertContains(res, data['expected'], msg_prefix=msg_prefix)
+
+
+@ddt.ddt
+class IsFeatureEnabledHelperTest(TestCase):
+    """
+    Tests for the `is_feature_enabled` helper function.
+    """
+
+    middleware_classes = add_locale_middleware(UNMODIFIED_MIDDLEWARE_CLASSES)
+
+    @ddt.data({
+        'features': {
+            'ENABLE_LINGOX': True,
+        },
+        'site_configs': {},
+        'expected': True,
+        'message': 'Enabled via platform flag',
+    }, {
+        'features': {},
+        'site_configs': {
+            'ENABLE_LINGOX': True,
+        },
+        'expected': True,
+        'message': 'Enabled via site configs',
+    }, {
+        'features': {
+            'ENABLE_LINGOX': True,
+        },
+        'site_configs': {
+            'ENABLE_LINGOX': False,
+        },
+        'expected': False,
+        'message': 'Disabled via site configs',
+    }, {
+        'features': {},
+        'site_configs': {},
+        'expected': False,
+        'message': 'Disabled by default',
+    })
+    def test_is_enabled_method(self, data):
+        """
+        Tests for the `is_feature_enabled` method.
+        """
+        overrides = {
+            'MOCK_SITE_CONFIGS': data['site_configs'],
+            'FEATURES': data['features'],
+        }
+
+        with override_settings(**overrides):
+            assert is_feature_enabled() == data['expected'], data['message']
+
+    @ddt.data({
+        'is_feature_enabled': True,
+        'site_configs': {},
+        'expected': 'Héllö Wörld',
+        'unexpected': 'Hello World',
+        'message': 'Enabled, so site lang (eo) should be USED and req lang (en) should be IGNORED',
+    }, {
+        'is_feature_enabled': False,
+        'unexpected': 'Héllö Wörld',
+        'expected': 'Hello World',
+        'message': 'Disabled, so site lang (eo) should be IGNORED and req lang (en) should be USED',
+    })
+    @override_settings(MIDDLEWARE_CLASSES=middleware_classes, LANGUAGE_CODE='eo')
+    def test_feature_flags(self, data):
+        """
+        Test different combinations of feature flags.
+        """
+        with patch(
+            target='lingox.middleware.is_feature_enabled',
+            return_value=data['is_feature_enabled'],
+        ):
+            from lingox.middleware import is_feature_enabled as patched_is_feature_enabled
+            assert patched_is_feature_enabled() == data['is_feature_enabled']
+            res = self.client.get('/', HTTP_ACCEPT_LANGUAGE='en')
+
+        msg_prefix = 'Incorrect language detected - {message}'.format(message=data['message'])
+        self.assertNotContains(res, data['unexpected'], msg_prefix=msg_prefix)
+        self.assertContains(res, data['expected'], msg_prefix=msg_prefix)
 
 
 @ddt.ddt

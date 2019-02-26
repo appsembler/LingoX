@@ -48,7 +48,8 @@ feature. But mostly it's a configuration model in the admin panel available unde
 Next, install LingoX and configure it:
 
 - ``$ pip install -e git+https://github.com/appsembler/LingoX.git#egg=lingox``
-- Add ``lingox`` to the ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
+- Add ``lingox`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
+- Set ``FEATURES['ENABLE_LINGOX']`` to ``true`` in the ``lms.env.json`` (or your ``server-vars.yml``)
 - Set ``LANGUAGE_CODE`` to ``ar``
 - Reload the server
 - Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
@@ -58,6 +59,8 @@ Next, install LingoX and configure it:
   language for a specific site: go to Sites
   Configuration ``/admin/site_configuration/siteconfiguration/``, add a ``LANGUAGE_CODE`` key with the desired
   site-specific value to the site's configuration JSON.
+  To enable or disable the feature on a specific site, define the variable ``ENABLE_LINGOX`` in the site's
+  configuration JSON.
 
 Support Custom API Endpoints
   To retain compatibility with the mobile applications, LingoX will avoid tampering the
