@@ -23,7 +23,7 @@ def get_version(*file_paths):
     raise RuntimeError('Unable to find version string.')
 
 
-VERSION = get_version('lingox', '__init__.py')
+VERSION = get_version('localizerx', '__init__.py')
 
 if sys.argv[-1] == 'tag':
     print("Tagging the version on github:")
@@ -35,15 +35,15 @@ README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 CHANGELOG = open(os.path.join(os.path.dirname(__file__), 'CHANGELOG.rst')).read()
 
 setup(
-    name='lingox',
+    name='localizerx',
     version=VERSION,
     description="""An app to enforce a default language for the edX Platform regardless of browser language.""",
     long_description=README + '\n\n' + CHANGELOG,
     author='Omar Al-Ithawi',
     author_email='i@omardo.com',
-    url='https://github.com/appsembler/lingox',
+    url='https://github.com/appsembler/localizerx',
     packages=[
-        'lingox',
+        'localizerx',
     ],
     include_package_data=True,
     install_requires=[

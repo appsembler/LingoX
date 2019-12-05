@@ -1,4 +1,4 @@
-LingoX
+LocalizerX
 ======
 
 |travis-badge| |codecov-badge|
@@ -45,11 +45,11 @@ You can read more on the
 `Dark Lang <https://github.com/edx/edx-platform/wiki/Internationalization-and-localization#releasing-a-language>`_
 feature. But mostly it's a configuration model in the admin panel available under ``/admin/dark_lang/``.
 
-Next, install LingoX and configure it:
+Next, install LocalizerX and configure it:
 
-- ``$ pip install -e git+https://github.com/appsembler/LingoX.git#egg=lingox``
-- Add ``lingox`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
-- Set ``FEATURES['ENABLE_LINGOX']`` to ``true`` in the ``lms.env.json`` (or your ``server-vars.yml``)
+- ``$ pip install -e git+https://github.com/appsembler/LocalizerX.git#egg=localizerx``
+- Add ``localizerx`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` (or your ``server-vars.yml``)
+- Set ``FEATURES['ENABLE_LOCALIZERX']`` to ``true`` in the ``lms.env.json`` (or your ``server-vars.yml``)
 - Set ``LANGUAGE_CODE`` to ``ar``
 - Reload the server
 - Open a new incognito window on ``http://localhost:8000/``, you should see an Arabic interface
@@ -59,19 +59,19 @@ Next, install LingoX and configure it:
   language for a specific site: go to Sites
   Configuration ``/admin/site_configuration/siteconfiguration/``, add a ``LANGUAGE_CODE`` key with the desired
   site-specific value to the site's configuration JSON.
-  To enable or disable the feature on a specific site, define the variable ``ENABLE_LINGOX`` in the site's
+  To enable or disable the feature on a specific site, define the variable ``ENABLE_LOCALIZERX`` in the site's
   configuration JSON.
 
 Support Custom API Endpoints
-  To retain compatibility with the mobile applications, LingoX will avoid tampering the
+  To retain compatibility with the mobile applications, LocalizerX will avoid tampering the
   ``Accept-Language`` header of any URL with the following prefixes:
   - ``/api/``
   - ``/user_api/``
   - ``/notifier_api/``
 
-  However, different apps can introduce different API endpoints that are not covered, when needed LingoX can be
-  configured to filter different prefixes with the ``LINGOX_API_URL_PREFIXES`` setting in the ``lms.env.json``
-  (or ``EDXAPP_ENV_EXTRA.LINGOX_API_URL_PREFIXES`` in ``server-vars.yml``).
+  However, different apps can introduce different API endpoints that are not covered, when needed LocalizerX can be
+  configured to filter different prefixes with the ``LOCALIZERX_API_URL_PREFIXES`` setting in the ``lms.env.json``
+  (or ``EDXAPP_ENV_EXTRA.LOCALIZERX_API_URL_PREFIXES`` in ``server-vars.yml``).
 
 Monkey Patching
 ---------------
@@ -89,7 +89,7 @@ To start development or run the tests locally, first the environment must be pre
 
 .. code-block:: bash
 
-   $ mkvirtualenv lingox
+   $ mkvirtualenv localizerx
    $ make requirements
    $ make quality
    $ make test
@@ -127,14 +127,14 @@ Reporting Security Issues
 Please do not report security issues in public. Please email security@appsembler.org.
 
 
-.. |travis-badge| image:: https://travis-ci.org/appsembler/LingoX.svg?branch=master
-    :target: https://travis-ci.org/appsembler/LingoX
+.. |travis-badge| image:: https://travis-ci.org/appsembler/LocalizerX.svg?branch=master
+    :target: https://travis-ci.org/appsembler/LocalizerX
     :alt: Travis
 
-.. |codecov-badge| image:: http://codecov.io/github/appsembler/lingox/coverage.svg?branch=master
-    :target: http://codecov.io/github/appsembler/lingox?branch=master
+.. |codecov-badge| image:: http://codecov.io/github/appsembler/localizerx/coverage.svg?branch=master
+    :target: http://codecov.io/github/appsembler/localizerx?branch=master
     :alt: Codecov
 
-.. |license-badge| image:: https://img.shields.io/github/license/appsembler/lingox.svg
-    :target: https://github.com/appsembler/lingox/blob/master/LICENSE.txt
+.. |license-badge| image:: https://img.shields.io/github/license/appsembler/localizerx.svg
+    :target: https://github.com/appsembler/localizerx/blob/master/LICENSE.txt
     :alt: License

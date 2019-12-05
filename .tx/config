@@ -1,14 +1,14 @@
 [main]
 host = https://www.transifex.com
 
-[appsembler.lingox]
-file_filter = lingox/conf/locale/<lang>/LC_MESSAGES/django.po
-source_file = lingox/conf/locale/en/LC_MESSAGES/django.po
+[appsembler.localizerx]
+file_filter = localizerx/conf/locale/<lang>/LC_MESSAGES/django.po
+source_file = localizerx/conf/locale/en/LC_MESSAGES/django.po
 source_lang = en
 type = PO
 
-[appsembler.lingox-js]
-file_filter = lingox/conf/locale/<lang>/LC_MESSAGES/djangojs.po
-source_file = lingox/conf/locale/en/LC_MESSAGES/djangojs.po
+[appsembler.localizerx-js]
+file_filter = localizerx/conf/locale/<lang>/LC_MESSAGES/djangojs.po
+source_file = localizerx/conf/locale/en/LC_MESSAGES/djangojs.po
 source_lang = en
 type = PO

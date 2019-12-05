@@ -96,9 +96,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/lingox.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/localizerx.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/lingox.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/localizerx.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -115,8 +115,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/lingox"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/lingox"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/localizerx"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/localizerx"
 	@echo "# devhelp"
 
 .PHONY: epub

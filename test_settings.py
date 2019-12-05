@@ -29,7 +29,7 @@ ENV_TOKENS = {}
 
 # Dummy feature flags dictionary.
 FEATURES = {
-    'ENABLE_LINGOX': False,  # The feature is disabled by default.
+    'ENABLE_LOCALIZERX': False,  # The feature is disabled by default.
 }
 
 MIDDLEWARE_CLASSES = (
@@ -63,14 +63,14 @@ DATABASES = {
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'lingox',
+    'localizerx',
     'test_site',
 )
 
 LANGUAGE_CODE = 'eo'
 
 LOCALE_PATHS = [
-    root('lingox', 'conf', 'locale'),
+    root('localizerx', 'conf', 'locale'),
     root('tests', 'edx_platform_mock', 'conf', 'locale'),
 ]
 

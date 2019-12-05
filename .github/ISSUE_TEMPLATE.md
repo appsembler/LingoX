@@ -1,4 +1,4 @@
-* lingox version:
+* localizerx version:
 * Django version:
 * Python version:
 * Operating System:

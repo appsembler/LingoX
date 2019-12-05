@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests for LingoX.
+Tests for LocalizerX.
 """
 from __future__ import absolute_import, unicode_literals
 
@@ -11,14 +11,14 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
-from lingox.helpers import add_locale_middleware, is_api_request, is_feature_enabled
-from lingox.middleware import DefaultLocaleMiddleware
+from localizerx.helpers import add_locale_middleware, is_api_request, is_feature_enabled
+from localizerx.middleware import DefaultLocaleMiddleware
 
 # The disable below because pylint is not recognizing request.META.
 # pylint: disable=no-member
 
 
-LINGOX_MIDDLEWARE = 'lingox.middleware.DefaultLocaleMiddleware'
+LOCALIZERX_MIDDLEWARE = 'localizerx.middleware.DefaultLocaleMiddleware'
 SITE_MIDDLEWARE = 'django.contrib.sites.middleware.CurrentSiteMiddleware'
 
 UNMODIFIED_MIDDLEWARE_CLASSES = [
@@ -41,21 +41,21 @@ UNMODIFIED_MIDDLEWARE_CLASSES = [
 @ddt.ddt
 class SettingsTest(TestCase):
     """
-    Sanity checks for the settings related to the lingox module.
+    Sanity checks for the settings related to the localizerx module.
     """
 
     def test_if_enabled(self):
         """
         Ensure that the app is enabled.
         """
-        assert 'lingox' in settings.INSTALLED_APPS, 'The app should be installed by default in test.'
-        assert not settings.FEATURES['ENABLE_LINGOX'], 'The app should be disabled by default in test.'
+        assert 'localizerx' in settings.INSTALLED_APPS, 'The app should be installed by default in test.'
+        assert not settings.FEATURES['ENABLE_LOCALIZERX'], 'The app should be disabled by default in test.'
 
     def test_middleware_should_exists(self):
         """
         Ensure that the middleware is available through the add_locale_middleware class.
         """
-        assert LINGOX_MIDDLEWARE in settings.MIDDLEWARE_CLASSES
+        assert LOCALIZERX_MIDDLEWARE in settings.MIDDLEWARE_CLASSES
 
     def test_synced_constants(self):
         """
@@ -63,7 +63,7 @@ class SettingsTest(TestCase):
         """
         middleware_classes = [
             class_name for class_name in settings.MIDDLEWARE_CLASSES
-            if class_name != LINGOX_MIDDLEWARE
+            if class_name != LOCALIZERX_MIDDLEWARE
         ]
 
         assert middleware_classes == UNMODIFIED_MIDDLEWARE_CLASSES
@@ -86,7 +86,7 @@ class DefaultLocaleMiddlewareTest(TestCase):
         self.middleware = DefaultLocaleMiddleware()
         self.request_factory = RequestFactory()
 
-    @override_settings(LANGUAGE_CODE='eo', FEATURES={'ENABLE_LINGOX': True})
+    @override_settings(LANGUAGE_CODE='eo', FEATURES={'ENABLE_LOCALIZERX': True})
     def test_non_api_views(self):
         """
         Test the middleware on non-API pages.
@@ -102,7 +102,7 @@ class DefaultLocaleMiddlewareTest(TestCase):
             'Should preserve the original language in another META variable.'
 
     @ddt.data('/api/', '/user_api/')
-    @override_settings(LANGUAGE_CODE='ar', FEATURES={'ENABLE_LINGOX': True})
+    @override_settings(LANGUAGE_CODE='ar', FEATURES={'ENABLE_LOCALIZERX': True})
     def test_api_views(self, api_url):
         """
         Ensure that the middleware doesn't change the non-API pages.
@@ -166,7 +166,7 @@ class DefaultLocaleMiddlewareTest(TestCase):
             'LANGUAGE_CODE': data['settings_lang'],
             'MOCK_SITE_CONFIGS': data['site_configs'],
             'FEATURES': {
-                'ENABLE_LINGOX': True
+                'ENABLE_LOCALIZERX': True
             },
             'MIDDLEWARE_CLASSES': self.middleware_classes,
         }
@@ -188,7 +188,7 @@ class IsFeatureEnabledHelperTest(TestCase):
 
     @ddt.data({
         'features': {
-            'ENABLE_LINGOX': True,
+            'ENABLE_LOCALIZERX': True,
         },
         'site_configs': {},
         'expected': True,
@@ -196,16 +196,16 @@ class IsFeatureEnabledHelperTest(TestCase):
     }, {
         'features': {},
         'site_configs': {
-            'ENABLE_LINGOX': True,
+            'ENABLE_LOCALIZERX': True,
         },
         'expected': True,
         'message': 'Enabled via site configs',
     }, {
         'features': {
-            'ENABLE_LINGOX': True,
+            'ENABLE_LOCALIZERX': True,
         },
         'site_configs': {
-            'ENABLE_LINGOX': False,
+            'ENABLE_LOCALIZERX': False,
         },
         'expected': False,
         'message': 'Disabled via site configs',
@@ -245,10 +245,10 @@ class IsFeatureEnabledHelperTest(TestCase):
         Test different combinations of feature flags.
         """
         with patch(
-            target='lingox.middleware.is_feature_enabled',
+            target='localizerx.middleware.is_feature_enabled',
             return_value=data['is_feature_enabled'],
         ):
-            from lingox.middleware import is_feature_enabled as patched_is_feature_enabled
+            from localizerx.middleware import is_feature_enabled as patched_is_feature_enabled
             assert patched_is_feature_enabled() == data['is_feature_enabled']
             res = self.client.get('/', HTTP_ACCEPT_LANGUAGE='en')
 
@@ -260,7 +260,7 @@ class IsFeatureEnabledHelperTest(TestCase):
 @ddt.ddt
 class APIRequestHelperTest(TestCase):
     """
-    Test cases for the API request helper of lingox module.
+    Test cases for the API request helper of localizerx module.
     """
 
     def setUp(self):
@@ -278,7 +278,7 @@ class APIRequestHelperTest(TestCase):
         {'path': '/user_api/', 'should_be_api': True},
         {'path': '/notifier_api/', 'should_be_api': True},
         {'path': '/api/discussion/', 'should_be_api': True},
-        {'path': '/reporting/api/', 'should_be_api': False},  # By default, LingoX don't know about reporting
+        {'path': '/reporting/api/', 'should_be_api': False},  # By default, LocalizerX don't know about reporting
     )
     def test_default_api_endpoints(self, path, should_be_api):
         """
@@ -287,7 +287,7 @@ class APIRequestHelperTest(TestCase):
         assert is_api_request(self.request_factory.get(path)) == should_be_api
 
     @override_settings(ENV_TOKENS={
-        'LINGOX_API_URL_PREFIXES': [
+        'LOCALIZERX_API_URL_PREFIXES': [
             '/api/',
             '/reporting/api/',
         ]
@@ -297,7 +297,7 @@ class APIRequestHelperTest(TestCase):
         {'path': '/', 'should_be_api': False},  # Still falsey
         {'path': '/api/', 'should_be_api': True},  # Custom configuration should replicate the default
         {'path': '/user_api/', 'should_be_api': False},  # Can be configured to ignore default's configurations.
-        {'path': '/reporting/api/', 'should_be_api': True},  # LingoX's now recognizes /reporting/api
+        {'path': '/reporting/api/', 'should_be_api': True},  # LocalizerX's now recognizes /reporting/api
     )
     def test_endpoints_from_configs(self, path, should_be_api):
         """
@@ -373,7 +373,7 @@ class MiddlewareAdderHelperTest(TestCase):
         """
         updated_middlewares = add_locale_middleware(UNMODIFIED_MIDDLEWARE_CLASSES)
 
-        lingx_index = updated_middlewares.index(LINGOX_MIDDLEWARE)
+        lingx_index = updated_middlewares.index(LOCALIZERX_MIDDLEWARE)
         other_index = updated_middlewares.index(other_middleware)
         assert lingx_index < other_index,  \
             'DefaultLocaleMiddleware should come before any other locale-related middleware'
