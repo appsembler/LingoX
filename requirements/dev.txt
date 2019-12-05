@@ -36,7 +36,7 @@ pylint==1.7.1             # via edx-lint, pylint-celery, pylint-django, pylint-p
 pytz==2018.4              # via django
 pyyaml==5.1               # via edx-i18n-tools
 requests-toolbelt==0.8.0  # via twine
-requests==2.18.4          # via requests-toolbelt, twine
+requests==2.20.0          # via requests-toolbelt, twine
 six==1.11.0               # via astroid, diff-cover, edx-i18n-tools, edx-lint, pip-tools, pylint, tox
 tox-battery==0.5.1
 tox==3.0.0

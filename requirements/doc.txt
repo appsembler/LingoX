@@ -27,7 +27,7 @@ pygments==2.2.0           # via readme-renderer, sphinx
 pyparsing==2.2.0          # via packaging
 pytz==2018.4              # via babel
 readme-renderer==20.0
-requests==2.18.4          # via sphinx
+requests==2.20.0          # via sphinx
 restructuredtext-lint==1.1.3  # via doc8
 six==1.11.0               # via bleach, doc8, edx-sphinx-theme, html5lib, packaging, readme-renderer, sphinx, stevedore
 snowballstemmer==1.2.1    # via sphinx
