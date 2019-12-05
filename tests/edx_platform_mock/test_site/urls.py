@@ -1,5 +1,5 @@
 """
-URLs for lingox.
+URLs for localizerx.
 """
 from __future__ import absolute_import, unicode_literals
 

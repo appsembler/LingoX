@@ -6,4 +6,4 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '0.1.0'
 
-default_app_config = 'lingox.apps.LingoXConfig'  # pylint: disable=invalid-name
+default_app_config = 'localizerx.apps.LocalizerXConfig'  # pylint: disable=invalid-name

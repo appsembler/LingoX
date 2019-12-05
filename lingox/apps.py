@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-lingox Django application initialization.
+localizerx Django application initialization.
 """
 
 from __future__ import absolute_import, unicode_literals
@@ -8,18 +8,18 @@ from __future__ import absolute_import, unicode_literals
 from django.apps import AppConfig
 from django.conf import settings
 
-from lingox.helpers import add_locale_middleware
+from localizerx.helpers import add_locale_middleware
 
 
-class LingoXConfig(AppConfig):
+class LocalizerXConfig(AppConfig):
     """
-    Configuration for the lingox Django application.
+    Configuration for the localizerx Django application.
     """
 
-    name = 'lingox'
+    name = 'localizerx'
 
     def ready(self):
         """
-        Monkeypatch MIDDLEWARE_CLASSES to the LingoX middleware.
+        Monkeypatch MIDDLEWARE_CLASSES to the LocalizerX middleware.
         """
         settings.MIDDLEWARE_CLASSES = add_locale_middleware(settings.MIDDLEWARE_CLASSES)

@@ -1,5 +1,5 @@
 """
-Helper functions for the LingoX module.
+Helper functions for the LocalizerX module.
 """
 from __future__ import absolute_import, unicode_literals
 
@@ -15,17 +15,17 @@ LOGGER = logging.getLogger(__name__)
 
 def add_locale_middleware(middleware_classes):
     """
-    Add the LingoX's DefaultLocaleMiddleware to the MIDDLEWARE_CLASSES tuple correctly.
+    Add the LocalizerX's DefaultLocaleMiddleware to the MIDDLEWARE_CLASSES tuple correctly.
 
     Args:
         middleware_classes: The MIDDLEWARE_CLASSES tuple from the settings.
     Return:
-        The new MIDDLEWARE_CLASSES with the lingox middleware.
+        The new MIDDLEWARE_CLASSES with the localizerx middleware.
     """
-    lingox_middleware = 'lingox.middleware.DefaultLocaleMiddleware'
+    localizerx_middleware = 'localizerx.middleware.DefaultLocaleMiddleware'
     site_middleware = 'django.contrib.sites.middleware.CurrentSiteMiddleware'
 
-    if lingox_middleware in middleware_classes:
+    if localizerx_middleware in middleware_classes:
         return middleware_classes
 
     if not isinstance(middleware_classes, tuple):
@@ -62,7 +62,7 @@ def add_locale_middleware(middleware_classes):
     # middleware in order for it to work
     return (
         middleware_classes[:first_locale_middleware_index]
-        + (lingox_middleware,)
+        + (localizerx_middleware,)
         + middleware_classes[first_locale_middleware_index:]
     )
 
@@ -81,7 +81,7 @@ def is_api_request(request):
         '/notifier_api/',
     ]
 
-    api_prefixes = settings.ENV_TOKENS.get('LINGOX_API_URL_PREFIXES', default_api_prefixes)
+    api_prefixes = settings.ENV_TOKENS.get('LOCALIZERX_API_URL_PREFIXES', default_api_prefixes)
 
     for prefix in api_prefixes:
         if request.path.startswith(prefix):
@@ -94,5 +94,5 @@ def is_feature_enabled():
     """
     Check if the feature is enabled for the Site or for the platform as a whole.
     """
-    is_enabled_in_platform = settings.FEATURES.get('ENABLE_LINGOX', False)
-    return configuration_helpers.get_value('ENABLE_LINGOX', is_enabled_in_platform)
+    is_enabled_in_platform = settings.FEATURES.get('ENABLE_LOCALIZERX', False)
+    return configuration_helpers.get_value('ENABLE_LOCALIZERX', is_enabled_in_platform)

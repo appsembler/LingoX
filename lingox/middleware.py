@@ -1,11 +1,11 @@
 """
-LingoX i18n Middleware.
+LocalizerX i18n Middleware.
 """
 from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 
-from lingox.helpers import is_api_request, is_feature_enabled
+from localizerx.helpers import is_api_request, is_feature_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
